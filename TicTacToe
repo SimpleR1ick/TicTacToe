@@ -1,0 +1,124 @@
+#  TicTacToe.py
+#  Copyright 2022
+#  Author: Henrique Dalmagro
+
+############################
+# Font code in Python 3.10 
+############################
+
+
+# Imports
+from tkinter import *
+from tkinter import messagebox
+from random import choice as r
+
+
+# Root Config
+root = Tk()
+root.title("TicTacToe")
+root.geometry("280x300")
+root.resizable(False, False)
+
+
+# Global variables
+move = r(['O', 'X'])
+count = 0
+board = [[], [], []]  
+
+
+############################
+# Logical Funtions
+############################
+
+# Check the board trying to find a winner
+def checkWin(board, count):
+    for i in range(3): # The firts line is used to rows and the second to columns
+        if (board[i][0]["text"] == board[i][1]["text"] == board[i][2]["text"] == move or
+                board[0][i]["text"] == board[1][i]["text"] == board[2][i]["text"] == move):
+            messagebox.showinfo("Congrats!!", move + " has won")
+
+    # Verify diagonals
+    if (board[0][0]["text"] == board[1][1]["text"] == board[2][2]["text"] == move or
+            board[0][2]["text"] == board[1][1]["text"] == board[2][0]["text"] == move):
+        messagebox.showinfo("Congrats!!", move + " has won")
+    else:
+        if count == 9:  # If the amount of plays reaches nine and nobody wins, results a draw.
+            messagebox.showinfo("Tied!!", "The match ended in a draw")
+
+
+# Change the turn of the moves
+def changeSymbol():
+    global move
+
+    for i in ['O', 'X']:
+        if not (i == move):
+            move = i
+            break
+
+
+# Sets the properties of a button
+def createButton(frame):
+    btn = Button(frame, text=" ", height=6, width=12)
+
+    return btn
+
+
+# Disables the button when clicked, checks victory and finally changes the turn
+def clickButton(row, col):
+    global count
+
+    count += 1
+    board[row][col].config(text=move, state=DISABLED)
+    checkWin(board, count)
+    changeSymbol()
+
+
+############################
+# Draw functions
+############################
+
+# Creates and positions all buttons
+def startGame():
+    global board
+
+    # Uses loop counters as coordinates
+    for r in range(3):
+        for c in range(3):
+            board[r].append(createButton(root))
+            board[r][c].config(command=lambda row=r, col=c: clickButton(row, col))
+            board[r][c].grid(row=r, column=c)
+
+
+# Reset all buttons state to NORMAL
+def resetGame():
+    global move, count
+
+    move = r(['O', 'X'])
+    count = 0
+
+    # Goes around the board and activates all the buttons
+    for i in range(3):
+        for j in range(3):
+            board[i][j]["text"] = " "
+            board[i][j]["state"] = NORMAL
+
+
+# Sets window properties    
+def menu():
+    menubar = Menu(root)
+    root.config(menu=menubar)
+
+    my_menu = Menu(menubar, tearoff=0)
+    my_menu.add_command(label="Reset game", command=resetGame)
+    menubar.add_cascade(label="Options", menu=my_menu)
+    
+    
+############################
+# Main function
+############################
+
+# Initialize the game
+if __name__ == "__main__":
+    menu()
+    startGame()
+    root.mainloop()
